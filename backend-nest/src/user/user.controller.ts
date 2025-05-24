@@ -1,6 +1,7 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class UserController {
@@ -16,4 +17,9 @@ export class UserController {
     const { password, ...rest } = user;
     return rest;
   }
+
+  @Post('login')
+    async login(@Body() dto: LoginDto) {
+    return this.userService.login(dto);
+    }
 }
