@@ -24,6 +24,11 @@ export default function Navbar() {
             Se connecter
           </Button>
         </Link>
+				<Link to="/register">
+          <Button variant="outline" size="sm">
+            S'inscrire
+          </Button>
+        </Link>
       </nav>
     </header>
   )
