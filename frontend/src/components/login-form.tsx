@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
@@ -16,6 +17,8 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
+
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,18 +47,18 @@ export default function LoginForm() {
     }
 
     try {
-      // Simulation d'une requête de connexion
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Ici vous ajouteriez votre logique de connexion réelle
-      console.log("Tentative de connexion avec:", { email, password })
-
-      // Redirection après connexion réussie
-      // router.push('/dashboard')
-    } catch (error) {
-      setErrors({ general: "Erreur de connexion. Vérifiez vos identifiants." })
+      const response = await axios.post("http://localhost:3000/auth/login", {
+        email,
+        password,
+      })
+    
+      console.log("Connexion réussie :", response.data)
+      localStorage.setItem("user", JSON.stringify(response.data))
+      navigate("/conversations") // Redirige vers la page d'accueil après la connexion réuss
+    } catch (error: any) {
+      setErrors({ general: error.response?.data?.message || "Erreur de connexion." })
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
