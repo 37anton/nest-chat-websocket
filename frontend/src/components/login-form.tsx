@@ -53,7 +53,7 @@ export default function LoginForm() {
       })
     
       console.log("Connexion réussie :", response.data)
-      localStorage.setItem("user", JSON.stringify(response.data))
+      localStorage.setItem("user", JSON.stringify(response.data));
       navigate("/conversations") // Redirige vers la page d'accueil après la connexion réuss
     } catch (error: any) {
       setErrors({ general: error.response?.data?.message || "Erreur de connexion." })

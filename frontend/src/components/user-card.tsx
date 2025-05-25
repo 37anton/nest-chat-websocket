@@ -6,8 +6,8 @@ import { MessageCircle, MapPin } from "lucide-react"
 
 interface User {
   id: string
-  firstName: string
-  lastName: string
+  prenom: string
+  nom: string
   country: string
   status: string
   isTyping: boolean
@@ -19,7 +19,7 @@ interface UserCardProps {
 
 export default function UserCard({ user }: UserCardProps) {
   const handleStartChat = () => {
-    console.log(`Démarrer une conversation avec ${user.firstName} ${user.lastName}`)
+    console.log(`Démarrer une conversation avec ${user.prenom} ${user.nom}`)
     // Ici vous ajouteriez la logique pour démarrer une conversation
   }
 
@@ -29,13 +29,13 @@ export default function UserCard({ user }: UserCardProps) {
         {/* Header */}
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="relative w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-purple-600">
-            {user.firstName.charAt(0)}
+            {user?.prenom?.charAt(0) || "?"}
             <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
           </div>
 
           <div className="space-y-2">
             <h3 className="font-semibold text-lg text-gray-900">
-              {user.firstName} {user.lastName}
+              {user.prenom} {user.nom}
             </h3>
 
             <div className="flex items-center justify-center gap-1 text-sm text-gray-600">

@@ -25,20 +25,17 @@ export default function Navbar() {
         <span className="ml-2 text-xl font-bold text-gray-900">ChatConnect</span>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-        <Link to="#features" className="text-sm font-medium hover:text-purple-600 transition-colors">
-          Fonctionnalités
-        </Link>
-        <Link to="#how-it-works" className="text-sm font-medium hover:text-purple-600 transition-colors">
-          Comment ça marche
-        </Link>
-        <Link to="#safety" className="text-sm font-medium hover:text-purple-600 transition-colors">
-          Sécurité
-        </Link>
-
         {isLoggedIn ? (
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            Se déconnecter
-          </Button>
+          <>
+            <Link to="/online">
+              <Button variant="outline" size="sm">
+                  Voir les persones connectées
+                </Button>
+            </Link>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              Se déconnecter
+            </Button>
+          </>
         ) : (
           <>
             <Link to="/login">
