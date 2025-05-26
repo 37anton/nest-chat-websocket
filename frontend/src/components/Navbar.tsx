@@ -6,11 +6,24 @@ import { Button } from "@/components/ui/button"
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const navigate = useNavigate()
+  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
     const user = localStorage.getItem("user")
     setIsLoggedIn(!!user)
   }, [])
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}")
+    if (user?.id) {
+      fetch(`http://localhost:3000/messages/conversations/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          const totalUnread = data.reduce((sum: number, conv: any) => sum + conv.unreadCount, 0)
+          setUnreadCount(totalUnread)
+        })
+    }
+  }, [])  
 
   const handleLogout = () => {
     localStorage.removeItem("user")
@@ -27,10 +40,15 @@ export default function Navbar() {
       <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
         {isLoggedIn ? (
           <>
-            <Link to="/conversations">
+            <Link to="/conversations" className="relative">
               <Button variant="outline" size="sm">
-                  Mes conversations
-                </Button>
+                Mes conversations
+              </Button>
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
             <Link to="/online">
               <Button variant="outline" size="sm">

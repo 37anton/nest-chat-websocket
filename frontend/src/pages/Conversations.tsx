@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
+import { io, Socket } from "socket.io-client"
 import { MessageCircle } from "lucide-react"
 import ConversationCard from "@/components/conversation-card"
 import Navbar from "@/components/Navbar"
@@ -10,7 +11,7 @@ interface Conversation {
   firstName: string
   lastName: string
   lastMessage: string
-  lastMessageTime: string
+  lastMessageTime: Date
   isOnline: boolean
   unreadCount: number
   lastMessageFromMe: boolean
@@ -18,37 +19,60 @@ interface Conversation {
 
 export default function ConversationsInterface() {
   const [conversations, setConversations] = useState<Conversation[]>([])
+  const socketRef = useRef<Socket | null>(null)
+  const userRef = useRef<any>(null)
+
+  // Fonction pour charger les conversations
+  const fetchConversations = async () => {
+    const storedUser = localStorage.getItem("user")
+    const currentUser = storedUser ? JSON.parse(storedUser) : null
+    if (!currentUser) return
+
+    userRef.current = currentUser
+
+    const res = await fetch(`http://localhost:3000/messages/conversations/${currentUser.id}`)
+    const data = await res.json()
+
+    const formatted = data.map((conv: any, index: number) => ({
+      userId: conv.userId,
+      firstName: conv.firstName,
+      lastName: conv.lastName,
+      avatar: "/placeholder.svg?height=60&width=60",
+      lastMessage: conv.lastMessage,
+      lastMessageTime: new Date(conv.lastMessageTime),
+      lastMessageFromMe: conv.lastMessageFromMe,
+      unreadCount: conv.unreadCount,
+      isOnline: conv.isOnline,
+      isTyping: false,
+    }))
+
+    setConversations(formatted)
+  }
 
   useEffect(() => {
-    const fetchConversations = async () => {
-      const storedUser = localStorage.getItem("user")
-      const currentUser = storedUser ? JSON.parse(storedUser) : null
-      if (!currentUser) return
-    
-      const res = await fetch(`http://localhost:3000/messages/conversations/${currentUser.id}`)
-      const data = await res.json()
-    
-      const formatted = data.map((conv: any, index: number) => ({
-        id: index.toString(), // ou `${conv.userId}-${conv.lastMessageTime}`
-        userId: conv.userId,
-        firstName: conv.firstName,
-        lastName: conv.lastName,
-        avatar: "/placeholder.svg?height=60&width=60", // valeur par défaut
-        lastMessage: conv.lastMessage,
-        lastMessageTime: new Date(conv.lastMessageTime),
-        lastMessageFromMe: conv.lastMessageFromMe,
-        unreadCount: conv.unreadCount,
-        isOnline: conv.isOnline,
-        isTyping: false, // pas encore géré
-      }))
-    
-      setConversations(formatted)
-    }
-  
     fetchConversations()
-  }, [])
 
-  const totalUnread = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0)
+    const storedUser = localStorage.getItem("user")
+    const currentUser = storedUser ? JSON.parse(storedUser) : null
+    if (!currentUser) return
+
+    const socket = io("http://localhost:3000", {
+      query: {
+        user: JSON.stringify(currentUser),
+      },
+    })
+
+    socketRef.current = socket
+
+    socket.on(`new-message-${currentUser.id}`, (message: any) => {
+      console.log("🔔 Nouveau message reçu :", message)
+      fetchConversations()
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
