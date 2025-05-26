@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './message.entity';
 import { User } from '../user/user.entity';
+import { ChatGateway } from 'src/chat/chat.gateway';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   async getConversationBetweenUsers(userId1: string, userId2: string): Promise<Message[]> {
@@ -38,8 +40,8 @@ export class MessageService {
     const conversationsMap = new Map<string, any>();
   
     for (const msg of messages) {
-      const otherUser =
-        msg.sender.id === userId ? msg.receiver : msg.sender;
+      const otherUser = msg.sender.id === userId ? msg.receiver : msg.sender;
+      const isFromMe = msg.sender.id === userId;
   
       if (!conversationsMap.has(otherUser.id)) {
         conversationsMap.set(otherUser.id, {
@@ -48,15 +50,22 @@ export class MessageService {
           lastName: otherUser.nom,
           lastMessage: msg.content,
           lastMessageTime: msg.createdAt,
-          lastMessageFromMe: msg.sender.id === userId,
-          unreadCount: 0, // à améliorer plus tard
-          isOnline: false, // à synchroniser avec les utilisateurs en ligne plus tard
+          lastMessageFromMe: isFromMe,
+          unreadCount: 0,
+          isOnline: false,
         });
+      }
+  
+      // Incrémente si le message est non lu et vient de l'autre utilisateur
+      if (!isFromMe && !msg.read) {
+        conversationsMap.get(otherUser.id).unreadCount++;
       }
     }
   
-    return Array.from(conversationsMap.values());
-  }
+    return Array.from(conversationsMap.values()).sort((a, b) =>
+      b.lastMessageTime.getTime() - a.lastMessageTime.getTime()
+    );
+  }  
 
   async sendMessage(senderId: string, receiverId: string, content: string): Promise<Message> {
     const message = this.messageRepository.create({
@@ -67,6 +76,21 @@ export class MessageService {
       read: false,
     });
   
-    return this.messageRepository.save(message);
+    const savedMessage = await this.messageRepository.save(message);
+
+    this.chatGateway.sendMessageToReceiver(savedMessage);
+
+    return savedMessage;
   }
+
+  async markMessagesAsRead(senderId: string, receiverId: string): Promise<void> {
+    await this.messageRepository
+      .createQueryBuilder()
+      .update()
+      .set({ read: true })
+      .where("senderId = :senderId", { senderId })
+      .andWhere("receiverId = :receiverId", { receiverId })
+      .andWhere("read = false")
+      .execute();
+  }  
 }

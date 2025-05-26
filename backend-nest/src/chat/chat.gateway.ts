@@ -5,6 +5,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Message } from 'src/message/message.entity';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -36,4 +37,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const users = this.connectedUsers.map(u => u.user);
     this.server.emit('online-users', users);
   }
+
+  sendMessageToReceiver(message: Message) {
+    this.server.emit(`new-message-${message.receiver.id}`, {
+      id: message.id,
+      senderId: message.sender.id,
+      receiverId: message.receiver.id,
+      content: message.content,
+      createdAt: message.createdAt,
+      read: message.read,
+    });
+  }  
 }

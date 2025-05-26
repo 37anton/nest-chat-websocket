@@ -19,4 +19,9 @@ export class MessageController {
   sendMessage(@Body() body: { senderId: string; receiverId: string; content: string }) {
     return this.messageService.sendMessage(body.senderId, body.receiverId, body.content);
   }
+
+  @Post('mark-as-read')
+  markAsRead(@Body() body: { senderId: string; receiverId: string }) {
+    return this.messageService.markMessagesAsRead(body.senderId, body.receiverId);
+  }
 }
