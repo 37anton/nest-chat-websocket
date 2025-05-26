@@ -27,6 +27,11 @@ export default function Navbar() {
       <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
         {isLoggedIn ? (
           <>
+            <Link to="/conversations">
+              <Button variant="outline" size="sm">
+                  Mes conversations
+                </Button>
+            </Link>
             <Link to="/online">
               <Button variant="outline" size="sm">
                   Voir les persones connectées

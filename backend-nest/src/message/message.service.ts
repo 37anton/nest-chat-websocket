@@ -24,4 +24,37 @@ export class MessageService {
       relations: ['sender', 'receiver'],
     });
   }
+
+  async getAllConversationsForUser(userId: string): Promise<any[]> {
+    const messages = await this.messageRepository.find({
+      where: [
+        { sender: { id: userId } },
+        { receiver: { id: userId } },
+      ],
+      relations: ['sender', 'receiver'],
+      order: { createdAt: 'DESC' },
+    });
+  
+    const conversationsMap = new Map<string, any>();
+  
+    for (const msg of messages) {
+      const otherUser =
+        msg.sender.id === userId ? msg.receiver : msg.sender;
+  
+      if (!conversationsMap.has(otherUser.id)) {
+        conversationsMap.set(otherUser.id, {
+          userId: otherUser.id,
+          firstName: otherUser.prenom,
+          lastName: otherUser.nom,
+          lastMessage: msg.content,
+          lastMessageTime: msg.createdAt,
+          lastMessageFromMe: msg.sender.id === userId,
+          unreadCount: 0, // à améliorer plus tard
+          isOnline: false, // à synchroniser avec les utilisateurs en ligne plus tard
+        });
+      }
+    }
+  
+    return Array.from(conversationsMap.values());
+  }
 }
