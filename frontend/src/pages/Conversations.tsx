@@ -74,6 +74,30 @@ export default function ConversationsInterface() {
     }
   }, [])
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    const currentUser = storedUser ? JSON.parse(storedUser) : null
+    if (!currentUser) return
+  
+    const socket = io("http://localhost:3000", {
+      query: {
+        user: JSON.stringify(currentUser),
+      },
+    })
+  
+    socket.on(`new-message-${currentUser.id}`, () => {
+      fetchConversations()
+    })
+  
+    socket.on(`refresh-conversations-${currentUser.id}`, () => {
+      fetchConversations()
+    })
+  
+    return () => {
+      socket.disconnect()
+    }
+  }, [])  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       <Navbar />

@@ -92,5 +92,8 @@ export class MessageService {
       .andWhere("receiverId = :receiverId", { receiverId })
       .andWhere("read = false")
       .execute();
+    
+    // Notify receiver to refresh their UI
+    this.chatGateway.emitRefreshConversations(receiverId);
   }  
 }

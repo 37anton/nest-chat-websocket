@@ -55,6 +55,23 @@ export default function ChatInterface() {
       .catch(console.error)
   }, [userId])
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    const currentUser = storedUser ? JSON.parse(storedUser) : null
+  
+    if (!currentUser || !userId) return
+  
+    // Marquer tous les messages de l’autre utilisateur comme lus
+    fetch("http://localhost:3000/messages/mark-as-read", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        senderId: userId,
+        receiverId: currentUser.id, 
+      }),
+    }).catch(console.error)
+  }, [userId])  
+
   const handleSendMessage = async () => {
     if (newMessage.trim() === "") return
   

@@ -47,5 +47,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       createdAt: message.createdAt,
       read: message.read,
     });
-  }  
+  }
+
+  emitRefreshConversations(userId: string) {
+    this.server.emit(`refresh-conversations-${userId}`);
+  }
 }
