@@ -55,25 +55,41 @@ export default function ChatInterface() {
       .catch(console.error)
   }, [userId])
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() === "") return
-
+  
     const storedUser = localStorage.getItem("user")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
     if (!currentUser || !chatUser) return
-
-    const message = {
+  
+    const contentToSend = newMessage.trim()
+    setNewMessage("")
+  
+    const optimisticMessage = {
       id: Date.now().toString(),
       senderId: currentUser.id,
       senderName: "Moi",
-      content: newMessage,
+      content: contentToSend,
       timestamp: new Date(),
       isOwn: true,
     }
-
-    setMessages(prev => [...prev, message])
-    setNewMessage("")
-    // TODO : Envoyer le message via WebSocket ou fetch
+    setMessages(prev => [...prev, optimisticMessage])
+  
+    try {
+      await fetch("http://localhost:3000/messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderId: currentUser.id,
+          receiverId: chatUser.id,
+          content: contentToSend,
+        }),
+      })
+    } catch (err) {
+      console.error("Erreur envoi message :", err)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -117,11 +133,6 @@ export default function ChatInterface() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm"><Phone className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm"><Video className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm"><MoreVertical className="h-4 w-4" /></Button>
-        </div>
       </header>
 
       {/* Messages */}
@@ -135,7 +146,6 @@ export default function ChatInterface() {
       {/* Input */}
       <div className="bg-white/90 backdrop-blur-sm border-t p-4">
         <div className="flex items-end gap-3">
-          <Button variant="ghost" size="sm" className="mb-2"><Smile className="h-5 w-5" /></Button>
           <div className="flex-1">
             <Input
               value={newMessage}

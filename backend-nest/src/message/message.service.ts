@@ -57,4 +57,16 @@ export class MessageService {
   
     return Array.from(conversationsMap.values());
   }
+
+  async sendMessage(senderId: string, receiverId: string, content: string): Promise<Message> {
+    const message = this.messageRepository.create({
+      sender: { id: senderId },
+      receiver: { id: receiverId },
+      content,
+      createdAt: new Date(),
+      read: false,
+    });
+  
+    return this.messageRepository.save(message);
+  }
 }
