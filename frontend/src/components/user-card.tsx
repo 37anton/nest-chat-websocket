@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { MessageCircle, MapPin } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 interface User {
   id: string
@@ -18,9 +19,14 @@ interface UserCardProps {
 }
 
 export default function UserCard({ user }: UserCardProps) {
+  const navigate = useNavigate()
+
   const handleStartChat = () => {
-    console.log(`Démarrer une conversation avec ${user.prenom} ${user.nom}`)
-    // Ici vous ajouteriez la logique pour démarrer une conversation
+    navigate(`/conversations/${user.id}`, {
+      state: {
+        user,
+      },
+    })
   }
 
   return (

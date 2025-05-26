@@ -44,7 +44,7 @@ export default function ConversationCard({ conversation }: ConversationCardProps
   }
 
   return (
-    <Link to={`/chat/${conversation.userId}`}>
+    <Link to={`/conversations/${conversation.userId}`}>
       <Card className="hover:shadow-md transition-all duration-200 border-0 shadow-sm hover:bg-white/80 cursor-pointer">
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
