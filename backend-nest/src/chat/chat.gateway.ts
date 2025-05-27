@@ -20,20 +20,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   
     const parsed = JSON.parse(user as string);
   
-    // Vérifie si le user est déjà présent par son ID
-    const alreadyConnected = this.connectedUsers.some(
-      (u) => u.user.id === parsed.id
+    // Supprimer toute entrée précédente de ce user.id
+    this.connectedUsers = this.connectedUsers.filter(
+      (u) => u.user.id !== parsed.id
     );
   
-    // Si ce user est déjà connecté, on ne le rajoute pas
-    if (alreadyConnected) {
-      console.log(`User ${parsed.id} déjà connecté`);
-      return;
-    }
-  
-    // Sinon, on l'ajoute
+    // Ajouter la connexion fraîche
     this.connectedUsers.push({ socketId: socket.id, user: parsed });
-    console.log(`User ${parsed.id} connecté`);
+  
+    console.log(`User ${parsed.id} (nouvelle connexion)`);
     this.server.emit('user-connected', parsed);
     this.emitUsers();
   }  
