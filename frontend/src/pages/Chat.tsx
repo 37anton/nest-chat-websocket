@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Send, MoreVertical, Phone, Video, Smile } from "lucide-react"
 import MessageBubble from "@/components/message-bubble"
+import Navbar from "@/components/Navbar"
 
 export default function ChatInterface() {
   const { userId } = useParams()
@@ -118,10 +119,12 @@ export default function ChatInterface() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b px-4 py-3 flex items-center justify-between">
+      
+      <Navbar />
+      
+      <div className="bg-white/90 backdrop-blur-sm border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link to="/online" className="text-purple-600 hover:text-purple-700">
+          <Link to="/conversations" className="text-purple-600 hover:text-purple-700">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-3">
@@ -150,7 +153,7 @@ export default function ChatInterface() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
