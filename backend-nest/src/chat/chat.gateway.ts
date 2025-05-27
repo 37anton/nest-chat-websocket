@@ -16,13 +16,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(socket: Socket) {
     const user = socket.handshake.query.user;
-    if (user) {
-      const parsed = JSON.parse(user as string);
-      this.connectedUsers.push({ socketId: socket.id, user: parsed });
-      this.server.emit('user-connected', parsed);
-      this.emitUsers();
+    if (!user) return;
+  
+    const parsed = JSON.parse(user as string);
+  
+    // Vérifie si le user est déjà présent par son ID
+    const alreadyConnected = this.connectedUsers.some(
+      (u) => u.user.id === parsed.id
+    );
+  
+    // Si ce user est déjà connecté, on ne le rajoute pas
+    if (alreadyConnected) {
+      console.log(`User ${parsed.id} déjà connecté`);
+      return;
     }
-  }
+  
+    // Sinon, on l'ajoute
+    this.connectedUsers.push({ socketId: socket.id, user: parsed });
+    console.log(`User ${parsed.id} connecté`);
+    this.server.emit('user-connected', parsed);
+    this.emitUsers();
+  }  
 
   handleDisconnect(socket: Socket) {
     const disconnected = this.connectedUsers.find(u => u.socketId === socket.id);
@@ -35,6 +49,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private emitUsers() {
     const users = this.connectedUsers.map(u => u.user);
+    console.log("utilisateurs connectés envoyés depuis le back : ", users);
+    console.log("coucou");
     this.server.emit('online-users', users);
   }
 
