@@ -3,6 +3,16 @@ import { Link, useNavigate } from "react-router-dom"
 import { io, Socket } from "socket.io-client"
 import { MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -85,9 +95,30 @@ export default function Navbar() {
                 Voir les personnes connectées
               </Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
+            {/* <Button variant="outline" size="sm" onClick={handleLogout}>
               Se déconnecter
-            </Button>
+            </Button> */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-lg cursor-pointer">
+                  {userRef.current.prenom?.charAt(0).toUpperCase() || "?"}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white">
+                <DropdownMenuLabel className="text-sm font-semibold">
+                  {userRef.current.prenom} {userRef.current.nom}
+                </DropdownMenuLabel>
+                <DropdownMenuGroup className="hover:bg-gray-100 hover:text-gray-900">
+                  <DropdownMenuItem onClick={() => alert("Bientôt :)")}>
+                    Couleur préférée
+                    <DropdownMenuShortcut>🎨</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuItem onClick={handleLogout} className="hover:bg-gray-100 hover:text-gray-900">
+                  Se déconnecter
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         ) : (
           <>
