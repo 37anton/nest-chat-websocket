@@ -54,6 +54,8 @@ export default function Navbar() {
   }, [])
 
   const handleLogout = () => {
+    socketRef.current?.disconnect()
+    
     localStorage.removeItem("user")
     setIsLoggedIn(false)
     navigate("/login")
