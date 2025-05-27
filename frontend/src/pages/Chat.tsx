@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Send, MoreVertical, Phone, Video, Smile } from "lucide-react"
 import MessageBubble from "@/components/message-bubble"
 import Navbar from "@/components/Navbar"
+import { io, Socket } from "socket.io-client"
 
 export default function ChatInterface() {
   const { userId } = useParams()
@@ -71,7 +72,50 @@ export default function ChatInterface() {
         receiverId: currentUser.id, 
       }),
     }).catch(console.error)
-  }, [userId])  
+  }, [userId])
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    const currentUser = storedUser ? JSON.parse(storedUser) : null
+    if (!currentUser || !userId) return
+  
+    const socket: Socket = io("http://localhost:3000", {
+      query: {
+        user: JSON.stringify(currentUser),
+      },
+    })
+  
+    socket.on(`new-message-${currentUser.id}`, (message: any) => {
+      // Vérifie si le message provient bien de la personne avec qui on parle
+      if (message.senderId === userId) {
+        setMessages(prev => [
+          ...prev,
+          {
+            id: message.id,
+            senderId: message.senderId,
+            senderName: `${chatUser?.prenom || "?"} ${chatUser?.nom || ""}`,
+            content: message.content,
+            timestamp: new Date(message.createdAt),
+            isOwn: false,
+          },
+        ])
+  
+        // Marque directement comme lu
+        fetch("http://localhost:3000/messages/mark-as-read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            senderId: userId,
+            receiverId: currentUser.id,
+          }),
+        }).catch(console.error)
+      }
+    })
+  
+    return () => {
+      socket.disconnect()
+    }
+  }, [userId, chatUser])  
 
   const handleSendMessage = async () => {
     if (newMessage.trim() === "") return
