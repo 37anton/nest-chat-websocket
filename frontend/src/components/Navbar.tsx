@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { io, Socket } from "socket.io-client"
-import { MessageCircle } from "lucide-react"
+import { MessageCircle, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,7 +9,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -17,6 +16,7 @@ import {
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
   const socketRef = useRef<Socket | null>(null)
   const userRef = useRef<any>(null)
@@ -77,11 +77,24 @@ export default function Navbar() {
         <MessageCircle className="h-8 w-8 text-purple-600" />
         <span className="ml-2 text-xl font-bold text-gray-900">ChatConnect</span>
       </Link>
-      <nav className="ml-auto flex gap-4 sm:gap-6 items-center relative">
+
+      {/* Menu Burger pour Mobile */}
+      <button
+        className="ml-auto lg:hidden"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        {isMobileMenuOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <Menu className="h-6 w-6" />
+        )}
+      </button>
+
+      <nav className={`${isMobileMenuOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row absolute lg:relative top-16 lg:top-0 left-0 right-0 bg-white lg:bg-transparent p-4 lg:p-0 border-b lg:border-0 gap-4 lg:gap-6 items-center lg:ml-auto`}>
         {isLoggedIn ? (
           <>
-            <Link to="/conversations" className="relative">
-              <Button variant="outline" size="sm">
+            <Link to="/conversations" className="relative w-full lg:w-auto">
+              <Button variant="outline" size="sm" className="w-full lg:w-auto">
                 Mes conversations
               </Button>
               {unreadCount > 0 && (
@@ -90,14 +103,11 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <Link to="/online">
-              <Button variant="outline" size="sm">
+            <Link to="/online" className="w-full lg:w-auto">
+              <Button variant="outline" size="sm" className="w-full lg:w-auto">
                 Voir les personnes connectées
               </Button>
             </Link>
-            {/* <Button variant="outline" size="sm" onClick={handleLogout}>
-              Se déconnecter
-            </Button> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-lg cursor-pointer">
@@ -109,7 +119,7 @@ export default function Navbar() {
                   {userRef.current.prenom} {userRef.current.nom}
                 </DropdownMenuLabel>
                 <DropdownMenuGroup className="hover:bg-gray-100 hover:text-gray-900">
-                  <DropdownMenuItem onClick={() => alert("Bientôt :)")}>
+                  <DropdownMenuItem onClick={() => alert("Bientôt :)")}>                    
                     Couleur préférée
                     <DropdownMenuShortcut>🎨</DropdownMenuShortcut>
                   </DropdownMenuItem>
@@ -122,13 +132,13 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <Link to="/login">
-              <Button variant="outline" size="sm">
+            <Link to="/login" className="w-full lg:w-auto">
+              <Button variant="outline" size="sm" className="w-full lg:w-auto">
                 Se connecter
               </Button>
             </Link>
-            <Link to="/register">
-              <Button variant="outline" size="sm">
+            <Link to="/register" className="w-full lg:w-auto">
+              <Button variant="outline" size="sm" className="w-full lg:w-auto">
                 S'inscrire
               </Button>
             </Link>
