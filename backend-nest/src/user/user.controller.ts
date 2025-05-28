@@ -1,4 +1,4 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Patch, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -21,5 +21,10 @@ export class UserController {
   @Post('login')
     async login(@Body() dto: LoginDto) {
     return this.userService.login(dto);
-    }
+  }
+
+  @Patch('users/:id/color')
+  async updateColor(@Param('id') id: string, @Body('color') color: string) {
+    return this.userService.updateColor(id, color);
+  }
 }

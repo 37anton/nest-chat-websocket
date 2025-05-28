@@ -52,4 +52,14 @@ export class UserService {
       updatedAt: user.updatedAt,
     };
   }
+
+  async updateColor(id: string, color: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new BadRequestException("Utilisateur non trouvé");
+    }
+  
+    user.color = color;
+    return this.userRepository.save(user);
+  }  
 }
