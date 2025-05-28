@@ -94,7 +94,7 @@ export default function Navbar() {
         {isLoggedIn ? (
           <>
             <Link to="/conversations" className="relative w-full lg:w-auto">
-              <Button variant="outline" size="sm" className="w-full lg:w-auto">
+              <Button size="sm" className="w-full lg:w-auto hover:bg-gray-200 bg-gray-100">
                 Mes conversations
               </Button>
               {unreadCount > 0 && (
@@ -104,7 +104,7 @@ export default function Navbar() {
               )}
             </Link>
             <Link to="/online" className="w-full lg:w-auto">
-              <Button variant="outline" size="sm" className="w-full lg:w-auto">
+              <Button size="sm" className="w-full lg:w-auto hover:bg-gray-200 bg-gray-100">
                 Voir les personnes connectées
               </Button>
             </Link>
@@ -121,7 +121,6 @@ export default function Navbar() {
                 <DropdownMenuGroup className="hover:bg-gray-100 hover:text-gray-900">
                   <DropdownMenuItem onClick={() => alert("Bientôt :)")}>                    
                     Couleur préférée
-                    <DropdownMenuShortcut>🎨</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={handleLogout} className="hover:bg-gray-100 hover:text-gray-900">
@@ -133,12 +132,12 @@ export default function Navbar() {
         ) : (
           <>
             <Link to="/login" className="w-full lg:w-auto">
-              <Button variant="outline" size="sm" className="w-full lg:w-auto">
+              <Button size="sm" className="w-full lg:w-auto hover:bg-gray-200 bg-gray-100">
                 Se connecter
               </Button>
             </Link>
             <Link to="/register" className="w-full lg:w-auto">
-              <Button variant="outline" size="sm" className="w-full lg:w-auto">
+              <Button size="sm" className="w-full lg:w-auto hover:bg-gray-200 bg-gray-100">
                 S'inscrire
               </Button>
             </Link>
