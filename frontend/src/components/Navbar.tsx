@@ -12,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import ColorPickerDialog from "./ColorPickerDialog"
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -62,6 +63,8 @@ export default function Navbar() {
       }
     }
   }, [])
+
+  const [openColorDialog, setOpenColorDialog] = useState(false)
 
   const handleLogout = () => {
     socketRef.current?.disconnect()
@@ -119,9 +122,9 @@ export default function Navbar() {
                   {userRef.current.prenom} {userRef.current.nom}
                 </DropdownMenuLabel>
                 <DropdownMenuGroup className="hover:bg-gray-100 hover:text-gray-900">
-                  <DropdownMenuItem onClick={() => alert("Bientôt :)")}>                    
-                    Couleur préférée
-                  </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setOpenColorDialog(true)}>
+                  Couleur préférée
+                </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={handleLogout} className="hover:bg-gray-100 hover:text-gray-900">
                   Se déconnecter
@@ -144,6 +147,7 @@ export default function Navbar() {
           </>
         )}
       </nav>
+      <ColorPickerDialog open={openColorDialog} onOpenChange={setOpenColorDialog} />
     </header>
   )
 }
