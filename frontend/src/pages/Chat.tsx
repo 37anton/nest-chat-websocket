@@ -145,6 +145,7 @@ export default function ChatInterface() {
     if (newMessage.trim() === "") return
 
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
     if (!currentUser || !chatUser) return
 
@@ -167,6 +168,7 @@ export default function ChatInterface() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           senderId: currentUser.id,

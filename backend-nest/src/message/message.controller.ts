@@ -34,8 +34,17 @@ export class MessageController {
     return this.messageService.getConversationBetweenUsers(userId1, userId2);
   }
   
+  @UseGuards(JwtAuthGuard)
   @Post('send')
-  sendMessage(@Body() body: { senderId: string; receiverId: string; content: string }) {
+  sendMessage(
+    @Body() body: { senderId: string; receiverId: string; content: string },
+    @Req() req: any
+  ) {
+    const userIdFromToken = req.user?.userId || req.user?.sub;
+    if (userIdFromToken !== body.senderId) {
+      throw new BadRequestException("Accès non autorisé");
+    }
+    
     return this.messageService.sendMessage(body.senderId, body.receiverId, body.content);
   }
 
