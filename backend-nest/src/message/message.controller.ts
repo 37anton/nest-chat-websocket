@@ -20,8 +20,17 @@ export class MessageController {
     return this.messageService.getAllConversationsForUser(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':userId1/:userId2')
-  getConversation(@Param('userId1') userId1: string, @Param('userId2') userId2: string) {
+  getConversation(
+    @Param('userId1') userId1: string, 
+    @Param('userId2') userId2: string,
+    @Req() req: any
+  ) {
+    const userIdFromToken = req.user?.userId || req.user?.sub;
+    if (userIdFromToken!== userId1 && userIdFromToken!== userId2) {
+      throw new BadRequestException("Accès non autorisé");
+    }
     return this.messageService.getConversationBetweenUsers(userId1, userId2);
   }
   

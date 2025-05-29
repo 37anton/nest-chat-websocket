@@ -29,11 +29,16 @@ export default function ChatInterface() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
 
     if (!currentUser || !userId) return
 
-    fetch(`http://localhost:3000/messages/${currentUser.id}/${userId}`)
+    fetch(`http://localhost:3000/messages/${currentUser.id}/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(res => res.json())
       .then(data => {
         const formatted = data.map((msg: any) => ({
