@@ -11,6 +11,7 @@ import { Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { HexColorPicker } from "react-colorful"
 import { useNavigate } from "react-router-dom"
+import { useOnlineUsers } from "@/context/OnlineUserContext"
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -34,6 +35,8 @@ export default function SignupForm() {
   }>({})
 
   const navigate = useNavigate();
+
+  const { setCurrentUser } = useOnlineUsers()
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -140,6 +143,7 @@ export default function SignupForm() {
       const data = await loginResponse.json();
     
       // 3. Sauvegarder le token et les infos utilisateur
+      setCurrentUser(data.user);
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
     
