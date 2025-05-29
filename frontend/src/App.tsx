@@ -6,6 +6,7 @@ import UsersOnline from "./pages/UsersOnline"
 import Conversations from "./pages/Conversations"
 import ChatInterface from "./pages/Chat"
 import { OnlineUserProvider } from "./context/OnlineUserContext"
+import PrivateRoute from "./components/PrivateRoute"
 
 export default function App() {
   return (
@@ -14,9 +15,32 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/online" element={<UsersOnline />} />
-        <Route path="/conversations" element={<Conversations />} />
-        <Route path="/conversations/:userId" element={<ChatInterface />} />
+
+        {/* Routes protégées */}
+        <Route
+          path="/online"
+          element={
+            <PrivateRoute>
+              <UsersOnline />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/conversations"
+          element={
+            <PrivateRoute>
+              <Conversations />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/conversations/:userId"
+          element={
+            <PrivateRoute>
+              <ChatInterface />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </OnlineUserProvider>
   )
