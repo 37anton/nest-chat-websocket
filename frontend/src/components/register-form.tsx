@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react"
 import { Link } from "react-router-dom"
+import { HexColorPicker } from "react-colorful"
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ export default function SignupForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    color: "#a855f7"
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -241,6 +243,27 @@ export default function SignupForm() {
           </button>
         </div>
         {errors.confirmPassword && <p className="text-sm text-red-600">{errors.confirmPassword}</p>}
+      </div>
+
+      {/* Couleur préférée */}
+      <div className="space-y-2">
+        <Label htmlFor="color" className="text-sm font-medium text-gray-700">
+          Couleur préférée
+        </Label>
+        <div className="flex items-center gap-4">
+          <div className="w-24">
+            <HexColorPicker
+              color={formData.color}
+              onChange={(color) => setFormData((prev) => ({ ...prev, color }))}
+            />
+          </div>
+          <div
+            className="w-10 h-10 rounded-full border"
+            style={{ backgroundColor: formData.color }}
+            title={formData.color}
+          ></div>
+        </div>
+        <p className="text-xs text-gray-500">Votre couleur pourra être changée plus tard.</p>
       </div>
 
       {/* Acceptation des conditions */}

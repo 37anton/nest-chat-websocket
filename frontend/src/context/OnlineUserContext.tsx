@@ -12,31 +12,46 @@ interface User {
 interface OnlineUserContextType {
   currentUser: User | null
   onlineUsers: User[]
+  setCurrentUser: (user: User | null) => void
 }
 
 const OnlineUserContext = createContext<OnlineUserContextType>({
   currentUser: null,
   onlineUsers: [],
+  setCurrentUser: () => {},
 })
 
 export const useOnlineUsers = () => useContext(OnlineUserContext)
 
 export const OnlineUserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [currentUser, setCurrentUserState] = useState<User | null>(null)
   const [onlineUsers, setOnlineUsers] = useState<User[]>([])
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (!storedUser) return
-
-    const parsedUser = JSON.parse(storedUser)
-    setCurrentUser(parsedUser)
-
-    socket.io.opts.query = {
-      user: JSON.stringify(parsedUser),
+  // Fonction utilisée partout pour définir le currentUser et connecter socket
+  const setCurrentUser = (user: User | null) => {
+    setCurrentUserState(user)
+    if (user) {
+      socket.io.opts.query = {
+        user: JSON.stringify(user),
+      }
+      if (!socket.connected) {
+        socket.connect()
+        console.log("🔌 Socket connecté via setCurrentUser()")
+      }
+    } else {
+      socket.disconnect()
     }
-    socket.connect()
+  }
 
+  useEffect(() => {
+    // Tentative de récupération auto au chargement
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser)
+      setCurrentUser(parsedUser)
+    }
+
+    // Listeners socket.io
     socket.on("online-users", (users: User[]) => {
       setOnlineUsers(users)
     })
@@ -47,7 +62,7 @@ export const OnlineUserProvider = ({ children }: { children: React.ReactNode }) 
   }, [])
 
   return (
-    <OnlineUserContext.Provider value={{ currentUser, onlineUsers }}>
+    <OnlineUserContext.Provider value={{ currentUser, onlineUsers, setCurrentUser }}>
       {children}
     </OnlineUserContext.Provider>
   )

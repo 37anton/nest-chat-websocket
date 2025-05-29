@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
+import { useOnlineUsers } from "@/context/OnlineUserContext"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
@@ -19,48 +20,50 @@ export default function LoginForm() {
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({})
 
   const navigate = useNavigate()
+  const { setCurrentUser } = useOnlineUsers()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setErrors({})
-
-    // Validation simple
+  
     const newErrors: { email?: string; password?: string; general?: string } = {}
-
+  
     if (!email) {
       newErrors.email = "L'email est requis"
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Format d'email invalide"
     }
-
+  
     if (!password) {
       newErrors.password = "Le mot de passe est requis"
     } else if (password.length < 6) {
       newErrors.password = "Le mot de passe doit contenir au moins 6 caractères"
     }
-
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       setIsLoading(false)
       return
     }
-
+  
     try {
       const response = await axios.post("http://localhost:3000/auth/login", {
         email,
         password,
       })
-    
-      console.log("Connexion réussie :", response.data)
-      localStorage.setItem("user", JSON.stringify(response.data));
-      navigate("/conversations") // Redirige vers la page d'accueil après la connexion réuss
+  
+      const user = response.data
+      
+      localStorage.setItem("user", JSON.stringify(user))
+      setCurrentUser(user)
+      navigate("/conversations")
     } catch (error: any) {
       setErrors({ general: error.response?.data?.message || "Erreur de connexion." })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }
+  }  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
