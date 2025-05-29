@@ -58,6 +58,10 @@ export default function Navbar() {
         fetchUnreadCount()
       })
 
+      socket.on(`refresh-conversations-${currentUser.id}`, () => {
+        fetchUnreadCount()
+      })
+
       return () => {
         socket.disconnect()
       }
