@@ -2,6 +2,9 @@ import { Controller, Post, Body, BadRequestException, Patch, Param } from '@nest
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { UseGuards, Req } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Request } from '@nestjs/common';
 
 @Controller('auth')
 export class UserController {
@@ -23,8 +26,17 @@ export class UserController {
     return this.userService.login(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('users/:id/color')
-  async updateColor(@Param('id') id: string, @Body('color') color: string) {
+  async updateColor(
+    @Param('id') id: string,
+    @Body('color') color: string,
+    @Req() req: any 
+  ) {
+    const userIdFromToken = req.user?.userId || req.user?.sub; // selon ta stratégie
+    if (userIdFromToken !== id) {
+      throw new BadRequestException("Accès non autorisé");
+    }
     return this.userService.updateUserColor(id, color);
   }
 }

@@ -24,26 +24,35 @@ export default function ColorPickerDialog({ open, onOpenChange }: ColorPickerDia
       const user = JSON.parse(storedUser)
       if (user.color) setColor(user.color)
     }
-  }, [open]) // à chaque ouverture, recharge la couleur
+  }, [open])
 
   const handleSave = async () => {
     const storedUser = localStorage.getItem("user")
-    if (!storedUser) return
-
+    const token = localStorage.getItem("token")
+    console.log("token", token)
+  
+    if (!storedUser || !token) return
+  
     const user = JSON.parse(storedUser)
-
+  
     try {
-      await axios.patch(`http://localhost:3000/auth/users/${user.id}/color`, { color })
-
-      // mettre à jour localStorage
+      await axios.patch(
+        `http://localhost:3000/auth/users/${user.id}/color`,
+        { color },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+  
       const updatedUser = { ...user, color }
       localStorage.setItem("user", JSON.stringify(updatedUser))
-
       onOpenChange(false)
     } catch (err) {
       console.error("Erreur lors de la sauvegarde de la couleur", err)
     }
-  }
+  }  
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
