@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { HexColorPicker } from "react-colorful"
+import { useNavigate } from "react-router-dom"
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -31,6 +32,8 @@ export default function SignupForm() {
     confirmPassword?: string
     general?: string
   }>({})
+
+  const navigate = useNavigate();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -97,24 +100,56 @@ export default function SignupForm() {
     }
 
     try {
-      // Simulation d'une requête d'inscription
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Ici vous ajouteriez votre logique d'inscription réelle
-      console.log("Tentative d'inscription avec:", {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-      })
-
-      // Redirection après inscription réussie
-      // router.push('/welcome') ou router.push('/login')
-    } catch (error) {
-      setErrors({ general: "Erreur lors de la création du compte. Veuillez réessayer." })
+      // 1. Enregistrement
+      const registerResponse = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          nom: formData.lastName,
+          prenom: formData.firstName,
+          color: formData.color,
+        }),
+      });
+    
+      if (!registerResponse.ok) {
+        const errorData = await registerResponse.json();
+        throw new Error(errorData.message || "Erreur lors de l'inscription");
+      }
+    
+      // 2. Connexion automatique
+      const loginResponse = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+    
+      if (!loginResponse.ok) {
+        const errorData = await loginResponse.json();
+        throw new Error(errorData.message || "Erreur lors de la connexion");
+      }
+    
+      const data = await loginResponse.json();
+    
+      // 3. Sauvegarder le token et les infos utilisateur
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    
+      // 4. Redirection
+      navigate("/online");
+    } catch (error: any) {
+      setErrors({ general: error.message || "Erreur inconnue" });
     } finally {
-      setIsLoading(false)
-    }
+      setIsLoading(false);
+    }    
   }
 
   return (
