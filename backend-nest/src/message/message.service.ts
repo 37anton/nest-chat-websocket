@@ -77,11 +77,24 @@ export class MessageService {
     });
   
     const savedMessage = await this.messageRepository.save(message);
-
-    this.chatGateway.sendMessageToReceiver(savedMessage);
-
-    return savedMessage;
+  
+    // Recharger le message avec les relations complètes (sender + receiver)
+    const fullMessage = await this.messageRepository.findOne({
+      where: { id: savedMessage.id },
+      relations: ['sender', 'receiver'],
+    });
+  
+    if (fullMessage) {
+      this.chatGateway.sendMessageToReceiver(fullMessage);
+    }
+  
+    if (!fullMessage) {
+      throw new Error("Message non trouvé après sauvegarde.");
+    }
+    return fullMessage;
+    
   }
+  
 
   async markMessagesAsRead(senderId: string, receiverId: string): Promise<void> {
     await this.messageRepository

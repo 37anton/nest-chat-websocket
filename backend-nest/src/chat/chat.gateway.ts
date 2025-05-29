@@ -57,6 +57,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       content: message.content,
       createdAt: message.createdAt,
       read: message.read,
+      sender: {
+        id: message.sender.id,
+        prenom: message.sender.prenom,
+        nom: message.sender.nom,
+        color: message.sender.color
+      }
     });
   }
 

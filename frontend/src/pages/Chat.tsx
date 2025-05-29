@@ -86,22 +86,22 @@ export default function ChatInterface() {
     })
   
     socket.on(`new-message-${currentUser.id}`, (message: any) => {
-      // Vérifie si le message provient bien de la personne avec qui on parle
-      if (message.senderId === userId) {
-        setMessages(prev => [
-          ...prev,
-          {
-            id: message.id,
-            senderId: message.senderId,
-            senderName: `${chatUser?.prenom || "?"} ${chatUser?.nom || ""}`,
-            content: message.content,
-            timestamp: new Date(message.createdAt),
-            isOwn: false,
-            senderColor: chatUser?.color || "#f1f1f1",
-          },
-        ])
-  
-        // Marque directement comme lu
+      const isOwn = message.senderId === currentUser.id;
+    
+      setMessages(prev => [
+        ...prev,
+        {
+          id: message.id,
+          senderId: message.senderId,
+          senderName: isOwn ? "Moi" : `${message.sender?.prenom} ${message.sender?.nom}`,
+          content: message.content,
+          timestamp: new Date(message.createdAt),
+          isOwn,
+          senderColor: message.sender?.color || (isOwn ? currentUser.color : "#eeeeee"),
+        },
+      ])
+    
+      if (!isOwn) {
         fetch("http://localhost:3000/messages/mark-as-read", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -111,7 +111,7 @@ export default function ChatInterface() {
           }),
         }).catch(console.error)
       }
-    })
+    })     
   
     return () => {
       socket.disconnect()
