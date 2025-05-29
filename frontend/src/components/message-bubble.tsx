@@ -9,6 +9,7 @@ interface Message {
   content: string
   timestamp: Date
   isOwn: boolean
+  senderColor: string
 }
 
 interface MessageBubbleProps {
@@ -26,13 +27,17 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-[70%] ${message.isOwn ? "order-2" : "order-1"}`}>
-        <Card
-          className={`p-3 ${
-            message.isOwn ? "bg-purple-600 text-white border-purple-600" : "bg-white text-gray-900 border-gray-200"
-          }`}
-        >
-          <p className="text-sm leading-relaxed">{message.content}</p>
-        </Card>
+      <Card
+        className={`p-3 text-sm leading-relaxed border ${
+          message.isOwn ? "text-white" : "text-white"
+        }`}
+        style={{
+          backgroundColor: message.senderColor,
+          borderColor: message.senderColor,
+        }}
+      >
+        <p>{message.content}</p>
+      </Card>
         <p className={`text-xs text-gray-500 mt-1 ${message.isOwn ? "text-right" : "text-left"}`}>
           {formatTime(message.timestamp)}
         </p>

@@ -42,7 +42,7 @@ export default function ChatInterface() {
           senderName: `${msg.sender.prenom} ${msg.sender.nom}`,
           content: msg.content,
           timestamp: new Date(msg.createdAt),
-          isOwn: msg.sender.id === currentUser.id,
+          isOwn: msg.sender.id === currentUser.id,senderColor: msg.sender.color,
         }))
         setMessages(formatted)
 
@@ -97,6 +97,7 @@ export default function ChatInterface() {
             content: message.content,
             timestamp: new Date(message.createdAt),
             isOwn: false,
+            senderColor: chatUser?.color || "#f1f1f1",
           },
         ])
   
@@ -134,6 +135,7 @@ export default function ChatInterface() {
       content: contentToSend,
       timestamp: new Date(),
       isOwn: true,
+      senderColor: currentUser.color
     }
     setMessages(prev => [...prev, optimisticMessage])
   
