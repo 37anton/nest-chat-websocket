@@ -1,12 +1,22 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { MessageService } from './message.service';
+import { Request } from '@nestjs/common';
+import { JwtAuthGuard
+
+ } from 'src/auth/jwt-auth.guard';
 
 @Controller('messages')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('conversations/:userId')
-  getAllConversations(@Param('userId') userId: string) {
+  getAllConversations(@Param('userId') userId: string, @Req() req: any) {
+    const userIdFromToken = req.user?.userId || req.user?.sub;
+    if (userIdFromToken !== userId) {
+      throw new BadRequestException("Accès non autorisé");
+    }
+
     return this.messageService.getAllConversationsForUser(userId);
   }
 

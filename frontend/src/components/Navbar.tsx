@@ -24,17 +24,23 @@ export default function Navbar() {
 
   const fetchUnreadCount = async () => {
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
-    if (!currentUser) return
-
+    if (!currentUser || !token) return
+  
     userRef.current = currentUser
-
-    const res = await fetch(`http://localhost:3000/messages/conversations/${currentUser.id}`)
+  
+    const res = await fetch(`http://localhost:3000/messages/conversations/${currentUser.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  
     const data = await res.json()
-
+  
     const count = data.filter((conv: any) => conv.unreadCount > 0).length
     setUnreadCount(count)
-  }
+  }  
 
   useEffect(() => {
     const user = localStorage.getItem("user")

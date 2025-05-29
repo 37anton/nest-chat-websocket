@@ -25,15 +25,21 @@ export default function ConversationsInterface() {
   // Fonction pour charger les conversations
   const fetchConversations = async () => {
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
-    if (!currentUser) return
-
+    if (!currentUser || !token) return
+  
     userRef.current = currentUser
-
-    const res = await fetch(`http://localhost:3000/messages/conversations/${currentUser.id}`)
+  
+    const res = await fetch(`http://localhost:3000/messages/conversations/${currentUser.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  
     const data = await res.json()
-
-    const formatted = data.map((conv: any, index: number) => ({
+  
+    const formatted = data.map((conv: any) => ({
       userId: conv.userId,
       firstName: conv.firstName,
       lastName: conv.lastName,
@@ -45,7 +51,7 @@ export default function ConversationsInterface() {
       isOnline: conv.isOnline,
       isTyping: false,
     }))
-
+  
     setConversations(formatted)
   }
 
