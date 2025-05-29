@@ -80,6 +80,7 @@ export default function Navbar() {
     socketRef.current?.disconnect()
     
     localStorage.removeItem("user")
+    localStorage.removeItem("token")
     setIsLoggedIn(false)
     navigate("/login")
   }
