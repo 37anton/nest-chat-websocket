@@ -64,13 +64,17 @@ export default function ChatInterface() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
 
     if (!currentUser || !userId) return
 
     fetch("http://localhost:3000/messages/mark-as-read", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         senderId: userId,
         receiverId: currentUser.id,
@@ -80,6 +84,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
     if (!currentUser || !userId) return
 
@@ -127,7 +132,10 @@ export default function ChatInterface() {
       if (!isOwn) {
         fetch("http://localhost:3000/messages/mark-as-read", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             senderId: userId,
             receiverId: currentUser.id,

@@ -48,8 +48,17 @@ export class MessageController {
     return this.messageService.sendMessage(body.senderId, body.receiverId, body.content);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('mark-as-read')
-  markAsRead(@Body() body: { senderId: string; receiverId: string }) {
+  markAsRead(
+    @Body() body: { senderId: string; receiverId: string },
+    @Req() req: any
+  ) {
+    const userIdFromToken = req.user?.userId || req.user?.sub;
+    if (userIdFromToken !== body.receiverId) {
+      throw new BadRequestException("Accès non autorisé");
+    }
+    
     return this.messageService.markMessagesAsRead(body.senderId, body.receiverId);
   }
 }
