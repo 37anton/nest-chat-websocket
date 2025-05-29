@@ -53,9 +53,10 @@ export default function LoginForm() {
         password,
       })
   
-      const user = response.data
+      const { user, token } = response.data;
+      localStorage.setItem("token", response.data.access_token)
+      localStorage.setItem("user", JSON.stringify(response.data.user))
       
-      localStorage.setItem("user", JSON.stringify(user))
       setCurrentUser(user)
       navigate("/conversations")
     } catch (error: any) {
