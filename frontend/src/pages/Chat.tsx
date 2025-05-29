@@ -5,7 +5,7 @@ import { useParams, useLocation, Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Send, MoreVertical, Phone, Video, Smile } from "lucide-react"
+import { ArrowLeft, Send } from "lucide-react"
 import MessageBubble from "@/components/message-bubble"
 import Navbar from "@/components/Navbar"
 import { io, Socket } from "socket.io-client"
@@ -42,11 +42,11 @@ export default function ChatInterface() {
           senderName: `${msg.sender.prenom} ${msg.sender.nom}`,
           content: msg.content,
           timestamp: new Date(msg.createdAt),
-          isOwn: msg.sender.id === currentUser.id,senderColor: msg.sender.color,
+          isOwn: msg.sender.id === currentUser.id,
+          senderColor: msg.sender.color,
         }))
         setMessages(formatted)
 
-        // Si on n’a pas reçu l’utilisateur via location.state, on le récupère depuis les messages
         if (!chatUser && data.length > 0) {
           const other =
             data.find((m: any) => m.sender.id !== currentUser.id)?.sender ||
@@ -60,16 +60,15 @@ export default function ChatInterface() {
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
-  
+
     if (!currentUser || !userId) return
-  
-    // Marquer tous les messages de l’autre utilisateur comme lus
+
     fetch("http://localhost:3000/messages/mark-as-read", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         senderId: userId,
-        receiverId: currentUser.id, 
+        receiverId: currentUser.id,
       }),
     }).catch(console.error)
   }, [userId])
@@ -78,16 +77,35 @@ export default function ChatInterface() {
     const storedUser = localStorage.getItem("user")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
     if (!currentUser || !userId) return
-  
+
     const socket: Socket = io("http://localhost:3000", {
       query: {
         user: JSON.stringify(currentUser),
       },
     })
-  
+
+    // Ecoute du changement de couleur en temps réel
+    socket.on(`user-color-changed-${userId}`, ({ color }) => {
+      setMessages(prev =>
+        prev.map(m =>
+          m.senderId === userId ? { ...m, senderColor: color } : m
+        )
+      )
+    })
+
+    socket.on(`user-color-changed-${currentUser.id}`, ({ color }) => {
+      localStorage.setItem("user", JSON.stringify({ ...currentUser, color }))
+      setMessages(prev =>
+        prev.map(m =>
+          m.senderId === currentUser.id ? { ...m, senderColor: color } : m
+        )
+      )
+    })
+
+    // Réception de nouveaux messages
     socket.on(`new-message-${currentUser.id}`, (message: any) => {
-      const isOwn = message.senderId === currentUser.id;
-    
+      const isOwn = message.senderId === currentUser.id
+
       setMessages(prev => [
         ...prev,
         {
@@ -100,7 +118,7 @@ export default function ChatInterface() {
           senderColor: message.sender?.color || (isOwn ? currentUser.color : "#eeeeee"),
         },
       ])
-    
+
       if (!isOwn) {
         fetch("http://localhost:3000/messages/mark-as-read", {
           method: "POST",
@@ -111,23 +129,23 @@ export default function ChatInterface() {
           }),
         }).catch(console.error)
       }
-    })     
-  
+    })
+
     return () => {
       socket.disconnect()
     }
-  }, [userId, chatUser])  
+  }, [userId, chatUser])
 
   const handleSendMessage = async () => {
     if (newMessage.trim() === "") return
-  
+
     const storedUser = localStorage.getItem("user")
     const currentUser = storedUser ? JSON.parse(storedUser) : null
     if (!currentUser || !chatUser) return
-  
+
     const contentToSend = newMessage.trim()
     setNewMessage("")
-  
+
     const optimisticMessage = {
       id: Date.now().toString(),
       senderId: currentUser.id,
@@ -135,10 +153,10 @@ export default function ChatInterface() {
       content: contentToSend,
       timestamp: new Date(),
       isOwn: true,
-      senderColor: currentUser.color
+      senderColor: currentUser.color,
     }
     setMessages(prev => [...prev, optimisticMessage])
-  
+
     try {
       await fetch("http://localhost:3000/messages/send", {
         method: "POST",
@@ -165,9 +183,7 @@ export default function ChatInterface() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex flex-col">
-      
       <Navbar />
-      
       <div className="bg-white/90 backdrop-blur-sm border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link to="/conversations" className="text-purple-600 hover:text-purple-700">
@@ -201,7 +217,6 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map(msg => (
           <MessageBubble key={msg.id} message={msg} />
@@ -209,7 +224,6 @@ export default function ChatInterface() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="bg-white/90 backdrop-blur-sm border-t p-4">
         <div className="flex items-end gap-3">
           <div className="flex-1">

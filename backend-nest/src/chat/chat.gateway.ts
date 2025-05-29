@@ -69,4 +69,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   emitRefreshConversations(userId: string) {
     this.server.emit(`refresh-conversations-${userId}`);
   }
+
+  emitColorChange(userId: string, color: string) {
+    this.server.emit(`user-color-changed-${userId}`, { userId, color });
+  }  
 }

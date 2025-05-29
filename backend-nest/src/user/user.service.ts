@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { ChatGateway } from 'src/chat/chat.gateway';
 
 export interface LoggedInUser {
   id: string;
@@ -20,6 +21,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private chatGateway: ChatGateway
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {
@@ -53,13 +55,13 @@ export class UserService {
     };
   }
 
-  async updateColor(id: string, color: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new BadRequestException("Utilisateur non trouvé");
-    }
+  async updateUserColor(userId: string, newColor: string) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) throw new Error("Utilisateur non trouvé");
   
-    user.color = color;
-    return this.userRepository.save(user);
+    user.color = newColor;
+    await this.userRepository.save(user);
+  
+    this.chatGateway.emitColorChange(userId, newColor);
   }  
 }

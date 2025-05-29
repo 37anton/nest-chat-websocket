@@ -25,6 +25,6 @@ export class UserController {
 
   @Patch('users/:id/color')
   async updateColor(@Param('id') id: string, @Body('color') color: string) {
-    return this.userService.updateColor(id, color);
+    return this.userService.updateUserColor(id, color);
   }
 }
