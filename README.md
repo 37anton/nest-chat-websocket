@@ -4,6 +4,14 @@ pour lancer nest :
 cd backend-nest
 docker compose -up --build
 
+.env :
+DB_HOST=postgres
+DB_PORT=5433
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=chatdb
+JWT_SECRET=super-secret-key
+
 adminer sur : 
 http://localhost:8085/
 Systeme: postgreSQL
