@@ -28,7 +28,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Ajouter la connexion fraîche
     this.connectedUsers.push({ socketId: socket.id, user: parsed });
   
-    console.log(`User ${parsed.id} (nouvelle connexion)`);
     this.server.emit('user-connected', parsed);
     this.emitUsers();
   }  
@@ -44,8 +43,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private emitUsers() {
     const users = this.connectedUsers.map(u => u.user);
-    console.log("utilisateurs connectés envoyés depuis le back : ", users);
-    console.log("coucou");
     this.server.emit('online-users', users);
   }
 

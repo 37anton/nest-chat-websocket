@@ -29,7 +29,6 @@ export default function ColorPickerDialog({ open, onOpenChange }: ColorPickerDia
   const handleSave = async () => {
     const storedUser = localStorage.getItem("user")
     const token = localStorage.getItem("token")
-    console.log("token", token)
   
     if (!storedUser || !token) return
   

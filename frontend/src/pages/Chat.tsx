@@ -207,26 +207,11 @@ export default function ChatInterface() {
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-purple-600">
               {chatUser?.prenom?.charAt(0) || "?"}
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
             </div>
             <div>
               <h1 className="font-semibold text-gray-900">
                 {chatUser?.prenom || "Utilisateur"} {chatUser?.nom || ""}
               </h1>
-              {otherUserTyping ? (
-                <div className="flex items-center gap-1 text-xs text-purple-600">
-                  <div className="flex gap-1">
-                    <div className="w-1 h-1 bg-purple-600 rounded-full animate-bounce" />
-                    <div className="w-1 h-1 bg-purple-600 rounded-full animate-bounce delay-100" />
-                    <div className="w-1 h-1 bg-purple-600 rounded-full animate-bounce delay-200" />
-                  </div>
-                  <span className="ml-1">En train d'écrire...</span>
-                </div>
-              ) : (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
-                  En ligne
-                </Badge>
-              )}
             </div>
           </div>
         </div>

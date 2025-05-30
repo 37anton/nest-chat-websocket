@@ -71,7 +71,6 @@ export default function ConversationsInterface() {
     socketRef.current = socket
 
     socket.on(`new-message-${currentUser.id}`, (message: any) => {
-      console.log("🔔 Nouveau message reçu :", message)
       fetchConversations()
     })
 

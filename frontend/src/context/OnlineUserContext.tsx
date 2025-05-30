@@ -21,8 +21,6 @@ const OnlineUserContext = createContext<OnlineUserContextType>({
   setCurrentUser: () => {},
 })
 
-console.log("🔌 Socket connecté via OnlineUserContext")
-
 export const useOnlineUsers = () => useContext(OnlineUserContext)
 
 export const OnlineUserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -38,7 +36,6 @@ export const OnlineUserProvider = ({ children }: { children: React.ReactNode }) 
       }
       if (!socket.connected) {
         socket.connect()
-        console.log("🔌 Socket connecté via setCurrentUser()")
       }
     } else {
       socket.disconnect()
