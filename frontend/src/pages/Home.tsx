@@ -23,48 +23,10 @@ export default function Home() {
 									inconnus du monde entier.
 								</p>
 							</div>
-
-							<div className="flex flex-col sm:flex-row gap-4">
-								<Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg">
-									<MessageCircle className="mr-2 h-5 w-5" />
-									Commencer à chatter
-								</Button>
-								<Button variant="outline" size="lg" className="px-8 py-3 text-lg">
-									<Users className="mr-2 h-5 w-5" />
-									Voir comment ça marche
-								</Button>
-							</div>
-
-							<div className="flex items-center gap-8 text-sm text-gray-500 mt-8">
-								<div className="flex items-center gap-2">
-									<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-									<span>2,847 personnes en ligne</span>
-								</div>
-								<div className="flex items-center gap-2">
-									<Globe className="h-4 w-4" />
-									<span>150+ pays connectés</span>
-								</div>
-							</div>
 						</div>
 					</div>
 				</section>
 			</main>
-
-			{/* Footer */}
-			<footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-white">
-				<p className="text-xs text-gray-500">© 2024 ChatConnect. Tous droits réservés.</p>
-				<nav className="sm:ml-auto flex gap-4 sm:gap-6">
-					<Link to="#" className="text-xs hover:underline underline-offset-4 text-gray-500">
-						Conditions d'utilisation
-					</Link>
-					<Link to="#" className="text-xs hover:underline underline-offset-4 text-gray-500">
-						Confidentialité
-					</Link>
-					<Link to="#" className="text-xs hover:underline underline-offset-4 text-gray-500">
-						Support
-					</Link>
-				</nav>
-			</footer>
 		</div>
 	)
 }
